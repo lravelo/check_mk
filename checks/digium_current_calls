@@ -1,0 +1,18 @@
+#!/usr/bin/env python
+# -*- encoding: utf-8; py-indent-offset: 4 -*-
+
+def inventory_digium_current_calls (info):
+	print int(info[0][0])
+	return [(None, {})]
+	
+def check_digium_current_calls (_no_item, _no_params, info):
+	yield 0, "Number of current calls: %s" % info[0][0], [ ( "current_calls", int(info[0][0]) ) ]
+
+check_info["digium_current_calls"] = {
+    "check_function"      : check_digium_current_calls,
+    "inventory_function"  : inventory_digium_current_calls,
+	"has_perfdata"		  : True,
+    "service_description" : "Digium Current Calls",
+    "snmp_info"           : ( ".1.3.6.1.4.1.22736.10.5", [ "1" ] ),
+    "snmp_scan_function"  : lambda oid: oid(".1.3.6.1.4.1.22736.10.1.1") is not None
+}
