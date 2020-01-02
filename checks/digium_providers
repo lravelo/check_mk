@@ -1,0 +1,31 @@
+#!/usr/bin/env python
+# -*- encoding: utf-8; py-indent-offset: 4 -*-
+# Credit to r.sander for helping me with this :-)
+# Reference: https://forum.checkmk.com/t/custom-snmp-check-for-digium-switchvox-not-getting-right-output/15565/7
+
+def parse_digium_providers(info):
+    return map(list, zip(*info))[1:]
+
+def inventory_digium_providers(parsed):
+    for line in parsed:
+        if line[2]:
+            yield line[2], {}
+	
+def check_digium_providers(item, _no_params, parsed):
+    for line in parsed:
+        if item == line[2]:
+            yield 0, "ID: %s" % line[0], [ ( "average_latency", float(line[6])) ]
+            yield 0, "type: %s" % line[1]
+            yield 0, "IP: %s" % line[3]
+            if line[7] not in ["ok", "registered"]:
+                yield 2, "state is %s" % line[7]
+	
+check_info["digium_providers"] = {
+    "parse_function"      : parse_digium_providers,
+    "check_function"      : check_digium_providers,
+    "inventory_function"  : inventory_digium_providers,
+    "service_description" : "Digium Provider %s",
+    "has_perfdata"        : True,
+    "snmp_info"           : ( ".1.3.6.1.4.1.22736.10.2.3", xrange(255) ),
+    "snmp_scan_function"  : lambda oid: oid(".1.3.6.1.4.1.22736.10.1.1") is not None
+}
