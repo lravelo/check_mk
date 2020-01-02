@@ -7,18 +7,25 @@ def parse_digium_providers(info):
     return map(list, zip(*info))[1:]
 
 def inventory_digium_providers(parsed):
-    for line in parsed:
-        if line[2]:
-            yield line[2], {}
+	print(parsed)
+	for line in parsed:
+		if line[2]:
+			yield line[2], {}
 	
 def check_digium_providers(item, _no_params, parsed):
     for line in parsed:
         if item == line[2]:
-            yield 0, "ID: %s" % line[0], [ ( "average_latency", float(line[6])) ]
-            yield 0, "type: %s" % line[1]
-            yield 0, "IP: %s" % line[3]
-            if line[7] not in ["ok", "registered", "unmonitored"]:
-                yield 2, "state is %s" % line[7]
+			if line[7] not in ["ok", "registered", "unmonitored"]:
+					yield 2, "State is %s" % line[7]
+			elif line[7] == "unmonitored":
+				yield 0, "ID: %s" % line[0]
+				yield 0, "type: %s" % line[1]
+				yield 0, "IP: %s" % line[3]
+			else:
+				yield 0, "ID: %s" % line[0], [ ( "average_latency", float(line[6])) ]
+				yield 0, "type: %s" % line[1]
+				yield 0, "IP: %s" % line[3]
+				
 	
 check_info["digium_providers"] = {
     "parse_function"      : parse_digium_providers,
@@ -26,6 +33,6 @@ check_info["digium_providers"] = {
     "inventory_function"  : inventory_digium_providers,
     "service_description" : "Digium Provider %s",
     "has_perfdata"        : True,
-    "snmp_info"           : ( ".1.3.6.1.4.1.22736.10.2.3", xrange(255) ),
+    "snmp_info"           : ( ".1.3.6.1.4.1.22736.10.2.3", xrange(50) ),
     "snmp_scan_function"  : lambda oid: oid(".1.3.6.1.4.1.22736.10.1.1") is not None
 }
