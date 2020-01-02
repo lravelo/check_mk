@@ -1,0 +1,25 @@
+#!/usr/bin/python
+# -*- encoding: utf-8; py-indent-offset: 4 -*-
+
+def inventory_digium_info(info):
+	if info[0] != []:
+		return [(None, {})]
+	
+def check_digium_info(_no_item, _no_params, info):
+	build = str(info[0][0])
+	max_con_calls = str(info[1][0])
+	used_ext = str(info[4][0])
+	max_ext = str(info[5][0])
+	
+	yield 0, "Digium Software Version: %s" % build
+	yield 0, "Maximum Concurrent Calls: %s" % max_con_calls
+	yield 0, "Extensions Provisioned: %s" % used_ext
+	yield 0, "Maximum Number of Extensions: %s" % max_ext
+
+check_info["digium_info"] = {
+    "check_function": check_digium_info,
+    "inventory_function": inventory_digium_info,
+    "service_description": "Digium SwitchVox Information",
+    "snmp_info": ( ".1.3.6.1.4.1.22736.10", ["1"] ),
+    "snmp_scan_function": lambda oid: oid(".1.3.6.1.4.1.22736.10.1.1") is not None
+}
