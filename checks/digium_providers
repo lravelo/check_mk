@@ -8,7 +8,7 @@ def parse_digium_providers(info):
 
 def inventory_digium_providers(parsed):
     for line in parsed:
-        if line[2]:
+        if line[2] and line[7] in ["ok", "registered"]:
             yield line[2], {}
 	
 def check_digium_providers(item, _no_params, parsed):
